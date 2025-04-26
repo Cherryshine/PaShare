@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -70,7 +71,7 @@ public class TextController {
     public String admin(){
         return "admin";
     }
-
+    
     // 어드민용 전체 텍스트 삭제 엔드포인트
     @DeleteMapping("/api/admin/delete-all")
     public ResponseEntity<String> deleteAllTexts() {
