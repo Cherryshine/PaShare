@@ -1,0 +1,88 @@
+# Java 관련 파일
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+*.log
+hs_err_pid*
+
+# Maven & Gradle 관련 파일
+target/
+build/
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# IntelliJ 관련 파일
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# Eclipse 관련 파일
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+# VS Code 관련 파일
+.vscode/
+
+# STS(Spring Tool Suite) 관련 파일
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# 운영체제 관련 파일
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Spring Boot 관련 파일
+application-dev.properties
+application-prod.properties
+
+# 민감한 정보가 포함된 파일
+# 본 프로젝트의 민감한 정보 포함 파일들
+src/main/resources/application-secret.properties
+src/main/resources/application-local.properties
+
+# 배포 관련 설정 파일
+.env
+deploy.sh
+
+# Node.js 관련 파일 (프론트엔드가 있는 경우)
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+
+# 로그 파일
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 빌드 파일
+dist/
+target/
+out/
+build/

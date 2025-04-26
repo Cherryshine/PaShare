@@ -1,0 +1,1331 @@
+<!DOCTYPE html><html lang="ko"><head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+    <title>PaShare 간편 텍스트공유</title>
+    <meta property="og:title" content="PaShare 간편 텍스트공유" />
+    <meta property="og:description" content="텍스트를 안전하게 공유하세요" />
+    <meta property="og:image" content="https://pashare.purplecodelabs.com/pashare_thumbnail.jpg" />
+    <meta property="og:image:width" content="300" />
+    <meta property="og:image:height" content="200" />
+    <meta property="og:url" content="https://pashare.purplecodelabs.com" />
+    <meta property="og:type" content="website" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <link href="https://ai-public.creatie.ai/gen_page/tailwind-custom.css" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com/3.4.5?plugins=forms@0.5.7,typography@0.5.13,aspect-ratio@0.4.2,container-queries@0.1.1"></script>
+    <script src="https://ai-public.creatie.ai/gen_page/tailwind-config.min.js" data-color="#000000" data-border-radius="small"></script>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, #8B5CF6 0%, #6B46C1 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .glass
+        {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1), 
+                      0 4px 10px rgba(138, 92, 246, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            min-width: 300px;
+            margin: 0 20px;
+            max-width: calc(100% - 40px);
+        }
+        .glass:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15), 
+                       0 6px 15px rgba(138, 92, 246, 0.3);
+        }
+        .tab-content
+        { transition: all 0.5s ease-in-out; }
+        .tab-panel { transition: all 0.5s ease-in-out; opacity: 1; transform: translateY(0); }
+        .tab-panel.hidden { opacity: 0; transform: translateY(20px); }
+        .floating-objects { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
+        .floating-object { 
+            position: absolute; 
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border-radius: 50%; 
+            animation: float 40s infinite linear;
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        @keyframes float { 0% { transform: translate(0, 0) rotate(0deg); } 100% { transform: translate(200px, 200px) rotate(360deg); } }
+        @media (prefers-color-scheme: dark) { body { background: linear-gradient(135deg, #4C1D95 0%, #2D1B4E 100%); }
+            .glass { background: rgba(0, 0, 0, 0.2); } }
+        .footer {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .heart {
+            color: #8B5CF6;
+            display: inline-block;
+            animation: heartbeat 1.5s infinite;
+            margin: 0 5px;
+        }
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            min-width: 280px;
+        }
+        .button-group button {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            white-space: nowrap;
+        }
+        .button-group button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+        }
+        .button-group button:hover::before {
+            transform: translateX(100%);
+        }
+        .button-group button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .button-group button i {
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+
+        /* 모달 스타일 개선 */
+        .modal {
+            position: fixed;
+            z-index: 10;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 8, 30, 0.75);
+            backdrop-filter: blur(15px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(92, 65, 131, 0.25));
+            color: #fff;
+            padding: 40px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 500px;
+            min-width: 300px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            transform: scale(0.95);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow: hidden;
+            position: relative;
+            margin: 0 20px;
+        }
+        
+        .modal.show .modal-content {
+            transform: scale(1);
+        }
+
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 18px;
+            font-weight: 300;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        .close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        #modalText {
+            background: rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            font-size: 15px;
+            line-height: 1.6;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin: 20px 0 30px;
+            color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+        }
+        
+        #modalText:focus {
+            outline: none;
+            border-color: rgba(139, 92, 246, 0.4);
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(139, 92, 246, 0.25);
+        }
+        
+        .modal-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #fff, #e4d0ff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+            text-align: center;
+        }
+        
+        .modal-description {
+            margin: 15px 0 30px;
+            font-size: 16px;
+            opacity: 0.85;
+            line-height: 1.7;
+            text-align: center;
+            letter-spacing: 0.2px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .modal-button {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            border: none;
+            padding: 16px 20px;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+        }
+        
+        .modal-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+            transform: translateX(-100%);
+            transition: transform 0.8s ease;
+        }
+        
+        .modal-button:hover::before {
+            transform: translateX(100%);
+        }
+        
+        .modal-button:hover {
+            background: rgba(255, 255, 255, 0.20);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-button i {
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        
+        /* 애플 스타일 모달 내용 */
+        .apple-modal-feature {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            text-align: left;
+        }
+        
+        .apple-modal-feature i {
+            margin-right: 15px;
+            font-size: 20px;
+            color: #8B5CF6;
+            opacity: 0.9;
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            backdrop-filter: blur(5px);
+        }
+        
+        .apple-modal-feature-text {
+            flex: 1;
+        }
+        
+        .apple-modal-feature-title {
+            font-weight: 600;
+            margin-bottom: 3px;
+            font-size: 15px;
+        }
+        
+        .apple-modal-feature-desc {
+            opacity: 0.8;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        /* 토스트 알림 스타일 */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 500;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            pointer-events: none;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            max-width: calc(100% - 40px);
+            margin: 0 20px;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .toast i {
+            margin-right: 8px;
+            color: #8B5CF6;
+            flex-shrink: 0;
+        }
+        
+        /* 애니메이션 효과 */
+        .copy-animation {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 40px;
+            height: 40px;
+            background-color: rgba(139, 92, 246, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            z-index: 5;
+        }
+        
+        .copy-animation i {
+            color: white;
+            margin: 0;
+        }
+        
+        @keyframes copyAnimation {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
+        
+        /* 라이트 모드 스타일 */
+        @media (prefers-color-scheme: light) {
+            .modal {
+                background-color: rgba(245, 240, 255, 0.8);
+            }
+            
+            .modal-content {
+                background: linear-gradient(135deg, rgba(250, 245, 255, 0.9), rgba(235, 225, 255, 0.95));
+                color: #333;
+                border: 1px solid rgba(180, 160, 220, 0.3);
+                box-shadow: 0 25px 50px rgba(100, 50, 200, 0.12);
+            }
+            
+            .close {
+                color: rgba(100, 80, 170, 0.7);
+                background: rgba(180, 160, 220, 0.2);
+            }
+            
+            .close:hover {
+                background: rgba(180, 160, 220, 0.3);
+                color: #4C1D95;
+            }
+            
+            #modalText {
+                background: rgba(245, 240, 255, 0.5);
+                border: 1px solid rgba(180, 160, 220, 0.2);
+                color: #333;
+                box-shadow: inset 0 2px 5px rgba(100, 50, 200, 0.05);
+            }
+            
+            .modal-title {
+                background: linear-gradient(90deg, #7E22CE, #6D28D9);
+                background-clip: text;
+                -webkit-background-clip: text;
+                color: transparent;
+            }
+            
+            .modal-description {
+                color: #4C1D95;
+                opacity: 0.8;
+            }
+            
+            .modal-button {
+                background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+                color: white;
+                box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+            }
+            
+            .modal-button:hover {
+                background: linear-gradient(135deg, #9061FF, #8B5CF6);
+                box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+            }
+            
+            .apple-modal-feature i {
+                color: #7C3AED;
+                background: rgba(180, 160, 220, 0.3);
+            }
+            
+            .apple-modal-feature-title {
+                color: #4C1D95;
+            }
+            
+            .apple-modal-feature-desc {
+                color: #6B46C1;
+                opacity: 0.8;
+            }
+            
+            .toast {
+                background: rgba(240, 235, 255, 0.95);
+                color: #4C1D95;
+                box-shadow: 0 5px 20px rgba(100, 50, 200, 0.12);
+                border: 1px solid rgba(180, 160, 220, 0.3);
+            }
+            
+            .toast i {
+                color: #7C3AED;
+            }
+            
+            .copy-animation {
+                background-color: rgba(139, 92, 246, 0.9);
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px 10px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                min-width: auto;
+                width: 100%;
+            }
+            
+            .button-group button {
+                font-size: 14px;
+                padding: 12px 15px;
+                width: 100%;
+            }
+            
+            .button-group button i {
+                margin-right: 6px;
+                font-size: 14px;
+            }
+            
+            .glass {
+                max-width: 100%;
+                margin: 0;
+                padding: 20px 15px;
+                min-width: auto;
+                width: 100%;
+            }
+            
+            .modal-content {
+                padding: 20px 15px;
+                margin: 0 10px;
+                max-width: calc(100% - 20px);
+            }
+            
+            .toast {
+                font-size: 13px;
+                padding: 10px 16px;
+                margin: 0 15px;
+                max-width: calc(100% - 30px);
+            }
+            
+            .toast i {
+                margin-right: 5px;
+                font-size: 14px;
+            }
+            
+            .modal-button {
+                font-size: 14px;
+                padding: 12px 15px;
+            }
+            
+            .modal-button i {
+                font-size: 14px;
+            }
+            
+            h1 {
+                font-size: 1.05rem !important;
+            }
+            
+            p {
+                font-size: 14px !important;
+            }
+            
+            .text-3xl {
+                font-size: 1.5rem !important;
+            }
+        }
+
+        /* 툴팁 스타일 */
+        #helpTooltip {
+            background: white;
+            color: #333;
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            max-width: 250px;
+            font-size: 14px;
+            line-height: 1.5;
+            z-index: 1000;
+            position: absolute;
+        }
+        
+        #helpTooltip[data-popper-placement^='left'] .arrow {
+            right: -4px;
+        }
+        
+        .arrow {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: white;
+            transform: rotate(45deg);
+        }
+
+        /* 지니 모달 효과 */
+        @keyframes genie-effect {
+            0% {
+                opacity: 0;
+                transform: scale(0.9) translateY(10px);
+                filter: brightness(1.2);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+                filter: brightness(1);
+            }
+        }
+        
+        .modal.show .modal-content.genie {
+            animation: genie-effect 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* 새로운 폴더 탭 스타일 */
+        .folder-tab {
+            position: absolute;
+            top: -45px;
+            left: 0;
+            height: 45px;
+            width: 180px;
+            background: rgba(255, 255, 255, 0.35);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-bottom: none;
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+        
+        .folder-tab img {
+            width: 110px;
+            height: auto;
+            transform: translateY(-2px);
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+        
+        .glass-container {
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 45px;
+        }
+        
+        .glass-container:hover {
+            transform: translateY(-2px);
+        }
+        
+        @media (prefers-color-scheme: dark) { 
+            .folder-tab { 
+                background: rgba(255, 255, 255, 0.15);
+                border-color: rgba(255, 255, 255, 0.2);
+            }
+        }
+
+        /* 모바일 미디어 쿼리 */
+        @media (max-width: 480px) {
+            .folder-tab {
+                width: 160px;
+                height: 40px;
+                top: -40px;
+            }
+            
+            .folder-tab img {
+                width: 90px;
+            }
+
+            .glass-container {
+                margin-top: 40px;
+            }
+        }
+
+        .welcome-text {
+            position: relative;
+            padding: 1rem;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border-radius: 12px;
+            backdrop-filter: blur(8px);
+        }
+
+        .welcome-text::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            padding: 1px;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .welcome-text {
+                background: linear-gradient(to right, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.1));
+            }
+            .welcome-text::before {
+                background: linear-gradient(to right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+            }
+        }
+    </style>
+</head>
+<body class="p-4">
+<div class="floating-objects">
+    <div class="floating-object" style="width: 200px; height: 200px; top: 10%; left: 10%;"></div>
+    <div class="floating-object" style="width: 300px; height: 300px; top: 40%; left: 60%;"></div>
+    <div class="floating-object" style="width: 160px; height: 160px; top: 70%; left: 30%;"></div>
+</div>
+<div class="glass-container">
+    <div class="folder-tab">
+        <img src="/pashare_logo.png" alt="PaShare 로고">
+    </div>
+    <div class="glass max-w-md w-full mx-auto rounded-xl p-6 relative" style="border-top-left-radius: 0;">
+        <div class="text-center mb-6 relative">
+            <h1 class="text-white/80 text-lg font-bold">텍스트를 간편하게 공유하세요</h1>
+            <button class="absolute -top-1 right-0 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center" id="helpBtn" onclick="showHelpModal()">
+                <i class="fas fa-question text-white/80 text-sm"></i>
+            </button>
+        </div>
+        <div class="bg-white/10 rounded-lg p-1 mb-6">
+            <div class="grid grid-cols-2 gap-1">
+                <button class="tab-btn active py-2 px-4 rounded-lg text-white transition-all bg-white/10" data-tab="share">텍스트 공유</button>
+                <button class="tab-btn py-2 px-4 rounded-lg text-white/60 hover:text-white transition-all" data-tab="view">텍스트 조회</button>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="tab-panel" id="sharePanel">
+                <textarea id="textInput" class="w-full bg-white/10 border border-white/20 rounded-lg p-4 text-white placeholder-white/60 mb-1 focus:ring-2 focus:ring-white/30 focus:border-transparent" style="resize: none;" rows="6" placeholder="공유할 텍스트를 입력하세요"></textarea>
+                <div class="text-right text-white/70 text-sm mb-4" id="charCount">0/20000</div>
+                <input id="savePasscodeInput" type="text" class="w-full bg-white/10 border border-white/20 rounded-lg p-4 text-white placeholder-white/60 mb-4 focus:ring-2 focus:ring-white/30 focus:border-transparent" placeholder="4자리 숫자를 입력하세요" maxlength="4"/>
+                
+                <div class="button-group">
+                    <button class="bg-white/20 hover:bg-white/30 text-white font-medium py-3 px-6 rounded-lg transition-all !rounded-button" onclick="showCodeShareModal()">
+                        <i class="fas fa-save mr-2"></i>숫자코드로 공유하기
+                    </button>
+                    <button class="bg-white/20 hover:bg-white/30 text-white font-medium py-3 px-6 rounded-lg transition-all !rounded-button" onclick="showLinkShareModal()">
+                        <i class="fas fa-link mr-2"></i>링크로 공유하기
+                    </button>
+                </div>
+            </div>
+            <div class="tab-panel hidden" id="viewPanel">
+                <input id="viewPasscodeInput" type="text" class="w-full bg-white/10 border border-white/20 rounded-lg p-4 text-white placeholder-white/60 mb-4 focus:ring-2 focus:ring-white/30 focus:border-transparent" placeholder="4자리 숫자코드를 입력하세요" maxlength="4"/>
+                <button class="w-full bg-white/20 hover:bg-white/30 text-white font-medium py-3 px-6 rounded-lg transition-all !rounded-button" onclick="viewText()">조회하기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    Made with <span class="heart">💜</span> by 퍼플코드랩스
+</div>
+
+<!-- 모달 창 -->
+<div id="modal" class="modal">
+    <div class="modal-content genie">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div class="modal-title">공유된 텍스트</div>
+        <div class="modal-description">
+            숫자코드로 공유된 텍스트입니다
+        </div>
+        <textarea id="modalText" class="w-full p-4 text-white resize-none" style="white-space:pre; white-space:pre-line; background: rgba(0, 0, 0, 0.25); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);" rows="8" readonly></textarea>
+        <div class="button-group mt-4">
+            <button class="modal-button" onclick="copyToClipboard()">
+                <i class="fas fa-copy"></i> 복사하기
+                <div class="copy-animation"><i class="fas fa-check"></i></div>
+            </button>
+        </div>
+        <button class="modal-button mt-3" onclick="closeModal()">
+            <i class="fas fa-times"></i> 닫기
+        </button>
+    </div>
+</div>
+
+<!-- 숫자코드 공유 모달 -->
+<div id="codeShareModal" class="modal">
+    <div class="modal-content genie">
+        <span class="close" onclick="closeCodeShareModal()">&times;</span>
+        <div class="modal-title">숫자코드로 공유하기</div>
+        <div class="modal-description">
+            4자리 숫자코드로 안전하게 텍스트를 공유합니다.<br>
+            상대방에게 숫자코드를 알려주세요.
+        </div>
+        
+        <div class="apple-modal-feature">
+            <i class="fas fa-key"></i>
+            <div class="apple-modal-feature-text">
+                <div class="apple-modal-feature-title">간편한 숫자코드</div>
+                <div class="apple-modal-feature-desc">쉽게 외울 수 있는 4자리 숫자코드를 사용합니다.</div>
+            </div>
+        </div>
+        
+        <div class="apple-modal-feature">
+            <i class="fas fa-trash-alt"></i>
+            <div class="apple-modal-feature-text">
+                <div class="apple-modal-feature-title">1회 조회 즉시 삭제</div>
+                <div class="apple-modal-feature-desc">숫자코드로 공유된 텍스트는 1회 조회 후 즉시 삭제됩니다.</div>
+            </div>
+        </div>
+        
+        <div class="apple-modal-feature">
+            <i class="fas fa-clock"></i>
+            <div class="apple-modal-feature-text">
+                <div class="apple-modal-feature-title">24시간 유효</div>
+                <div class="apple-modal-feature-desc">코드는 생성 후 24시간 동안 유효하며, 조회되지 않으면 자동 삭제됩니다.</div>
+            </div>
+        </div>
+        
+        <button class="modal-button" onclick="saveText()">
+            <i class="fas fa-check"></i> 공유하기
+        </button>
+    </div>
+</div>
+
+<!-- 링크 공유 모달 -->
+<div id="linkShareModal" class="modal">
+    <div class="modal-content genie">
+        <span class="close" onclick="closeLinkShareModal()">&times;</span>
+        <div class="modal-title">링크로 공유하기</div>
+        <div class="modal-description">
+            링크를 통해 안전하게 텍스트를 공유합니다.<br>
+            24시간 후 자동으로 만료됩니다.
+        </div>
+        
+        <div class="apple-modal-feature">
+            <i class="fas fa-link"></i>
+            <div class="apple-modal-feature-text">
+                <div class="apple-modal-feature-title">간편한 URL 공유</div>
+                <div class="apple-modal-feature-desc">링크를 누구에게나 공유할 수 있습니다.</div>
+            </div>
+        </div>
+        
+        <div class="apple-modal-feature">
+            <i class="fas fa-clock"></i>
+            <div class="apple-modal-feature-text">
+                <div class="apple-modal-feature-title">24시간 유효</div>
+                <div class="apple-modal-feature-desc">공유된 텍스트는 24시간 동안만 유지됩니다.</div>
+            </div>
+        </div>
+        
+        <button class="modal-button" onclick="shareViaLink()">
+            <i class="fas fa-paper-plane"></i> 링크 생성하기
+        </button>
+    </div>
+</div>
+
+<div id="toast" class="toast"><i class="fas fa-check-circle"></i> <span id="toastText">복사되었습니다</span></div>
+
+<!-- 도움말 모달 -->
+<div id="helpModal" class="modal">
+    <div class="modal-content genie">
+        <span class="close" onclick="closeHelpModal()">&times;</span>
+        <div class="modal-title">이용 안내</div>
+        
+        <div class="apple-modal-feature">
+            <i class="fas fa-comment-dots"></i>
+            <div class="apple-modal-feature-text">
+                <div class="apple-modal-feature-title">간편한 텍스트 공유</div>
+                <div class="apple-modal-feature-desc">"카카오톡 나에게 보내기" 등 외부 서비스를 사용할 수 없는 환경 또는 다른 플랫폼간의 텍스트 공유에서 불편함을 해소합니다.</div>
+            </div>
+        </div>
+        
+        <div class="apple-modal-feature">
+            <i class="fas fa-text-height"></i>
+            <div class="apple-modal-feature-text">
+                <div class="apple-modal-feature-title">최대 텍스트 길이</div>
+                <div class="apple-modal-feature-desc">최대 2만자의 텍스트를 공유할 수 있습니다.</div>
+            </div>
+        </div>
+        
+        <div class="apple-modal-feature">
+            <i class="fas fa-moon"></i>
+            <div class="apple-modal-feature-text">
+                <div class="apple-modal-feature-title">디스플레이 모드 변경</div>
+                <div class="apple-modal-feature-desc">기기의 다크 모드 설정을 통해 화면 밝기를 조절할 수 있습니다.</div>
+            </div>
+        </div>
+        
+        <div class="apple-modal-feature">
+            <i class="fas fa-clock"></i>
+            <div class="apple-modal-feature-text">
+                <div class="apple-modal-feature-title">24시간 유효</div>
+                <div class="apple-modal-feature-desc">공유된 텍스트는 24시간 동안만 유지됩니다.</div>
+            </div>
+        </div>
+        
+        <button class="modal-button" onclick="closeHelpModal()">
+            <i class="fas fa-check"></i> 확인
+        </button>
+    </div>
+</div>
+
+<script>
+    function copyToClipboard() {
+        const textArea = document.getElementById('modalText');
+        const button = document.querySelector('.modal-button');
+        const animation = button.querySelector('.copy-animation');
+        
+        // 애니메이션 효과 보여주기
+        animation.style.animation = 'copyAnimation 0.8s forwards';
+        
+        setTimeout(() => {
+            animation.style.animation = '';
+        }, 800);
+        
+        // 모던 브라우저용 clipboard API 시도
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(textArea.value)
+                .then(() => {
+                    showToast('클립보드에 복사되었습니다');
+                })
+                .catch(() => {
+                    fallbackCopyToClipboard(textArea);
+                });
+        } else {
+            // fallback 방식
+            fallbackCopyToClipboard(textArea);
+        }
+    }
+
+    function fallbackCopyToClipboard(textArea) {
+        try {
+            textArea.select();
+            document.execCommand('copy');
+            showToast('클립보드에 복사되었습니다');
+        } catch (err) {
+            showToast('복사할 수 없습니다');
+        }
+    }
+
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        const toastText = document.getElementById('toastText');
+        const toastIcon = toast.querySelector('i');
+        
+        // 메시지 내용 설정
+        toastText.textContent = message;
+        
+        // 메시지 유형에 따라 아이콘 변경
+        if (message.includes('실패') || message.includes('없습니다') || message.includes('확인') || 
+            message.includes('다른') || message.includes('이미 사용 중') || message.includes('입력하세요') ||
+            message.includes('확인해주세요') || message.includes('찾을 수 없') || message.includes('오류')) {
+            toastIcon.className = 'fas fa-exclamation-circle';
+            toastIcon.style.color = '#F87171'; // 빨간색
+        } else {
+            toastIcon.className = 'fas fa-check-circle';
+            toastIcon.style.color = '#8B5CF6'; // 기본 보라색
+        }
+        
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2500);
+    }
+
+    const helpBtn = document.getElementById('helpBtn');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+    
+    // 도움말 모달 표시/숨김 함수
+    function showHelpModal() {
+        document.getElementById('helpModal').classList.add('show');
+    }
+    
+    function closeHelpModal() {
+        document.getElementById('helpModal').classList.remove('show');
+    }
+    
+    // 도움말 버튼 클릭 시 모달 표시
+    helpBtn.addEventListener('click', () => {
+        showHelpModal();
+    });
+    
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabId = btn.dataset.tab;
+
+            tabBtns.forEach(b => {
+                b.classList.remove('active', 'bg-white/10', 'text-white');
+                b.classList.add('text-white/60');
+            });
+
+            btn.classList.add('active', 'bg-white/10', 'text-white');
+            btn.classList.remove('text-white/60');
+            tabPanels.forEach(panel => {
+                panel.classList.add('hidden');
+                panel.style.opacity = '0';
+            });
+            const activePanel = document.getElementById(`${tabId}Panel`);
+            activePanel.classList.remove('hidden');
+            setTimeout(() => {
+                activePanel.style.opacity = '1';
+            }, 10);
+        });
+    });
+    document.querySelectorAll('input[type="text"]').forEach(input => {
+        input.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
+    });
+    // 텍스트 저장 함수
+    function saveText() {
+        const text = document.getElementById('textInput').value;
+        const passcode = document.getElementById('savePasscodeInput').value;
+
+        if (!text.trim()) {
+            showToast('텍스트를 입력하세요');
+            return;
+        }
+        
+        if (text.length > 20000) {
+            showToast('텍스트는 최대 2만자까지 입력 가능합니다');
+            return;
+        }
+
+        if (!/^\d{4}$/.test(passcode)) {
+            showToast('숫자코드를 확인해주세요');
+            return;
+        }
+
+        // 텍스트와 패스코드를 로컬스토리지에 저장 (캡차 만료 시 복구용)
+        localStorage.setItem('pendingText', text);
+        localStorage.setItem('pendingPasscode', passcode);
+
+        fetch('/api/save-text', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ text, passcode })
+        })
+            .then(response => {
+                if (response.status === 302 || response.status === 401) {
+                    // 토큰 만료 또는 인증 실패로 리다이렉트 필요
+                    window.location.href = '/turnstile?redirectAfterCaptcha=true';
+                    return null;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data) {
+                    if (data.message && data.message.includes("already in use")) {
+                        // 패스코드가 이미 사용 중인 경우 (이중 체크)
+                        showToast('이미 사용 중인 패스코드입니다. 다른 패스코드를 입력해주세요.');
+                        document.getElementById('savePasscodeInput').focus();
+                        document.getElementById('savePasscodeInput').select();
+                        
+                        // 텍스트는 유지하고 패스코드만 스토리지에서 제거
+                        localStorage.removeItem('pendingPasscode');
+                        
+                        // 모달 닫기
+                        closeCodeShareModal();
+                    } else {
+                        // 성공적으로 저장된 경우
+                        showToast(data.message);
+                        // 성공적으로 저장되면 스토리지 삭제
+                        localStorage.removeItem('pendingText');
+                        localStorage.removeItem('pendingPasscode');
+                        
+                        // 입력란 초기화
+                        document.getElementById('textInput').value = '';
+                        document.getElementById('savePasscodeInput').value = '';
+                        
+                        // 모달 닫기
+                        closeCodeShareModal();
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('저장하는데 실패했습니다');
+            });
+    }
+
+    function viewText() {
+        const passcode = document.getElementById('viewPasscodeInput').value;
+
+        if (!/^\d{4}$/.test(passcode)) {
+            showToast('숫자코드를 확인해주세요');
+            return;
+        }
+
+        fetch(`/api/get-text?code=${passcode}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.text) {
+                    // 줄바꿈을 포함한 텍스트를 textarea에 표시
+                    document.getElementById('modalText').value = data.text;
+                    showModal();
+                } else {
+                    showToast('입력하신 숫자코드를 찾을 수 없습니다');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('텍스트를 로드하는 중 오류가 발생했습니다');
+            });
+    }
+
+    // 모달 열기 함수
+    function showModal() {
+        document.getElementById('modal').classList.add('show');
+        document.getElementById('modalText').focus();
+    }
+
+    // 모달 닫기 함수
+    function closeModal() {
+        document.getElementById('modal').classList.remove('show');
+    }
+
+    // 숫자코드 공유 모달 표시
+    function showCodeShareModal() {
+        const text = document.getElementById('textInput').value;
+        const passcode = document.getElementById('savePasscodeInput').value;
+
+        if (!text.trim()) {
+            showToast('텍스트를 입력하세요');
+            return;
+        }
+
+        if (!/^\d{4}$/.test(passcode)) {
+            showToast('숫자코드를 확인해주세요');
+            return;
+        }
+        
+        // 먼저 숫자코드가 사용 중인지 확인
+        fetch(`/api/check-passcode?code=${passcode}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.inUse) {
+                    // 이미 사용 중인 경우
+                    showToast('이미 사용 중인 패스코드입니다. 다른 패스코드를 입력해주세요.');
+                    document.getElementById('savePasscodeInput').focus();
+                    document.getElementById('savePasscodeInput').select();
+                } else {
+                    // 사용 가능한 경우 모달 표시
+                    document.getElementById('codeShareModal').classList.add('show');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // 에러 발생시 일단 모달 표시 (서버 오류일 수 있으므로)
+                document.getElementById('codeShareModal').classList.add('show');
+            });
+    }
+    
+    // 숫자코드 공유 모달 닫기
+    function closeCodeShareModal() {
+        document.getElementById('codeShareModal').classList.remove('show');
+    }
+    
+    // 링크 공유 모달 열기
+    function showLinkShareModal() {
+        const text = document.getElementById('textInput').value;
+        
+        if (!text.trim()) {
+            showToast('텍스트를 입력하세요');
+            return;
+        }
+        
+        document.getElementById('linkShareModal').classList.add('show');
+    }
+    
+    // 링크 공유 모달 닫기
+    function closeLinkShareModal() {
+        document.getElementById('linkShareModal').classList.remove('show');
+    }
+    
+    // 링크로 공유하기
+    function shareViaLink() {
+        const text = document.getElementById('textInput').value;
+        
+        if (!text.trim()) {
+            showToast('텍스트를 입력하세요');
+            return;
+        }
+        
+        if (text.length > 20000) {
+            showToast('텍스트는 최대 2만자까지 입력 가능합니다');
+            return;
+        }
+        
+        // 로컬스토리지에 저장
+        localStorage.setItem('pendingLinkShare', text);
+        
+        fetch('/api/share-via-link', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ text: text })
+        })
+        .then(response => {
+            if (response.status === 302 || response.status === 401) {
+                // 토큰 만료 또는 인증 실패로 리다이렉트 필요
+                window.location.href = '/turnstile?redirectAfterCaptcha=true&linkShare=true';
+                return null;
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data) {
+                // 링크 생성 성공 시 링크 페이지로 이동
+                window.location.href = `/share/${data.text}`;
+                
+                // 입력창 초기화
+                document.getElementById('textInput').value = '';
+                localStorage.removeItem('pendingLinkShare');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('링크 생성에 실패했습니다');
+            closeLinkShareModal();
+        });
+    }
+
+    // 글자수 카운터 기능 추가
+    const textInput = document.getElementById('textInput');
+    const charCount = document.getElementById('charCount');
+    const MAX_CHARS = 20000;
+    
+    textInput.addEventListener('input', function() {
+        const length = this.value.length;
+        charCount.textContent = length + '/' + MAX_CHARS;
+        
+        // 글자수 초과 시 스타일 변경
+        if (length > MAX_CHARS) {
+            charCount.classList.add('text-red-400');
+            charCount.classList.remove('text-white/70');
+        } else {
+            charCount.classList.add('text-white/70');
+            charCount.classList.remove('text-red-400');
+        }
+    });
+
+    // 페이지 로드 시 캡차 완료 후 자동 처리
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const autoShare = urlParams.get('autoShare');
+        const linkShare = urlParams.get('linkShare');
+        
+        // 글자수 카운터 기능 추가
+        const textInput = document.getElementById('textInput');
+        const charCount = document.getElementById('charCount');
+        const MAX_CHARS = 20000;
+        
+        textInput.addEventListener('input', function() {
+            const length = this.value.length;
+            charCount.textContent = length + '/' + MAX_CHARS;
+            
+            // 글자수 초과 시 스타일 변경
+            if (length > MAX_CHARS) {
+                charCount.classList.add('text-red-400');
+                charCount.classList.remove('text-white/70');
+            } else {
+                charCount.classList.add('text-white/70');
+                charCount.classList.remove('text-red-400');
+            }
+        });
+        
+        if (autoShare === 'true') {
+            if (linkShare === 'true') {
+                // 링크 공유 자동화
+                const pendingLinkShare = localStorage.getItem('pendingLinkShare');
+                
+                if (pendingLinkShare) {
+                    setTimeout(() => {
+                        fetch('/api/share-via-link', {
+                            method: 'POST',
+                            headers: { 
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ text: pendingLinkShare })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            // 링크 생성 성공 시 링크 페이지로 이동
+                            window.location.href = `/share/${data.text}`;
+                            
+                            // 로컬 스토리지 정리
+                            localStorage.removeItem('pendingLinkShare');
+                            
+                            // URL에서 파라미터 제거
+                            window.history.replaceState({}, document.title, '/');
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showToast('링크 생성에 실패했습니다');
+                        });
+                    }, 500);
+                }
+            } else {
+                // 기존 공유 자동화
+                const pendingText = localStorage.getItem('pendingText');
+                const pendingPasscode = localStorage.getItem('pendingPasscode');
+                
+                if (pendingText && pendingPasscode) {
+                    // 공유 탭으로 전환
+                    document.querySelector('[data-tab="share"]').click();
+                    
+                    // 텍스트와 패스코드 필드 채우기
+                    document.getElementById('textInput').value = pendingText;
+                    document.getElementById('savePasscodeInput').value = pendingPasscode;
+                    
+                    // 자동 공유 실행
+                    setTimeout(() => {
+                        fetch('/api/save-text', {
+                            method: 'POST',
+                            headers: { 
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ 
+                                text: pendingText, 
+                                passcode: pendingPasscode 
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.message && data.message.includes("already in use")) {
+                                // 패스코드가 이미 사용 중인 경우
+                                showToast('다른 사용자가 이미 동일한 패스코드를 사용했습니다. 다른 패스코드를 입력해주세요.');
+                                document.getElementById('savePasscodeInput').focus();
+                                document.getElementById('savePasscodeInput').select();
+                                
+                                // 텍스트는 유지하고 패스코드만 로컬스토리지에서 제거
+                                localStorage.removeItem('pendingPasscode');
+                            } else {
+                                // 성공적으로 저장된 경우
+                                showToast(data.message);
+                                // 로컬 스토리지 삭제
+                                localStorage.removeItem('pendingText');
+                                localStorage.removeItem('pendingPasscode');
+                                
+                                // 입력란 초기화
+                                document.getElementById('textInput').value = '';
+                                document.getElementById('savePasscodeInput').value = '';
+                            }
+                            
+                            // URL에서 autoShare 파라미터 제거
+                            window.history.replaceState({}, document.title, '/');
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showToast('저장하는데 실패했습니다');
+                        });
+                    }, 500); // 약간의 지연으로 UI가 로드된 후 실행
+                }
+            }
+        }
+    });
+</script>

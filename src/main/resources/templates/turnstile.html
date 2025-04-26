@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+    <title>PaShare 간편 텍스트공유</title>
+    <meta property="og:title" content="PaShare 간편 텍스트공유" />
+    <meta property="og:description" content="텍스트를 안전하게 공유하세요" />
+    <meta property="og:image" content="https://pashare.purplecodelabs.com/pashare_thumbnail.jpg" />
+    <meta property="og:image:width" content="300" />
+    <meta property="og:image:height" content="200" />
+    <meta property="og:url" content="https://pashare.purplecodelabs.com" />
+    <meta property="og:type" content="website" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, #8B5CF6 0%, #6B46C1 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 20px 10px;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 25px 20px;
+            max-width: 500px;
+            width: 100%;
+            min-width: 280px;
+            margin: 0 auto;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            white-space: nowrap;
+        }
+        p {
+            margin-bottom: 20px;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+        .captcha-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            width: 100%;
+            overflow: hidden;
+        }
+        .cf-turnstile {
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .heart {
+            color: #8B5CF6;
+            display: inline-block;
+            animation: heartbeat 1.5s infinite;
+            margin: 0 5px;
+        }
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .floating-objects { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
+        .floating-object { position: absolute; background: rgba(255, 255, 255, 0.1); border-radius: 50%; animation: float 40s infinite linear; }
+        @keyframes float { 0% { transform: translate(0, 0) rotate(0deg); } 100% { transform: translate(200px, 200px) rotate(360deg); } }
+        @media (prefers-color-scheme: dark) { 
+            body { background: linear-gradient(135deg, #4C1D95 0%, #2D1B4E 100%); }
+            .container { background: rgba(0, 0, 0, 0.2); }
+        }
+        .loading {
+            display: none;
+            margin-top: 20px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            white-space: nowrap;
+        }
+        .loading:after {
+            content: '.';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+        @media (max-width: 480px) {
+            body {
+                padding: 15px 10px;
+            }
+            
+            .container {
+                padding: 20px 15px;
+                margin: 0 15px;
+                width: calc(100% - 30px);
+                max-width: 100%;
+                min-width: auto;
+            }
+            
+            h1 {
+                font-size: 22px;
+            }
+            
+            p {
+                font-size: 14px;
+                padding: 0 5px;
+            }
+            
+            .captcha-container {
+                margin: 15px 0;
+                transform: scale(0.95);
+                transform-origin: center center;
+            }
+            
+            .footer {
+                font-size: 0.8rem;
+                margin-top: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-objects">
+        <div class="floating-object" style="width: 200px; height: 200px; top: 10%; left: 10%;"></div>
+        <div class="floating-object" style="width: 300px; height: 300px; top: 40%; left: 60%;"></div>
+        <div class="floating-object" style="width: 160px; height: 160px; top: 70%; left: 30%;"></div>
+    </div>
+    
+    <div class="container">
+        <h1>PaShare 보안 확인</h1>
+        <p>서비스를 이용하시기 전에 캡차 검증이 통과되어야 합니다.</p>
+        
+        <div class="captcha-container">
+            <div class="cf-turnstile" data-sitekey="0x4AAAAAABTEB-5r78Sowi4F" data-theme="dark" data-callback="onCaptchaSuccess"></div>
+        </div>
+        
+        <div class="loading" id="loadingText">자동으로 계속됩니다</div>
+    </div>
+    
+    <div class="footer">
+        Made with <span class="heart">💜</span> by 퍼플코드랩스
+    </div>
+
+    <script>
+        // URL 쿼리 파라미터 파싱
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectAfterCaptcha = urlParams.get('redirectAfterCaptcha') === 'true';
+        const linkShare = urlParams.get('linkShare') === 'true';
+        
+        // 리디렉션 URL 확인 (세션스토리지 대신 URL 파라미터 사용)
+        let redirectUrl = urlParams.get('redirectUrl') || '/';
+        
+        // 캡차 성공 시 호출되는 콜백
+        function onCaptchaSuccess(token) {
+            // 로딩 텍스트 표시
+            document.getElementById('loadingText').style.display = 'block';
+            
+            // 토큰을 서버로 전송하여 검증
+            fetch('/api/verify-captcha', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    token: token,
+                    redirectUrl: redirectUrl,
+                    autoShare: redirectAfterCaptcha ? 'true' : 'false',
+                    linkShare: linkShare ? 'true' : 'false'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 성공 시 서버에서 제공한 URL으로 리다이렉트
+                    window.location.href = data.redirectUrl || '/';
+                } else {
+                    alert('보안 확인에 실패했습니다. 다시 시도해주세요.');
+                    document.getElementById('loadingText').style.display = 'none';
+                    turnstile.reset();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('오류가 발생했습니다. 다시 시도해주세요.');
+                document.getElementById('loadingText').style.display = 'none';
+                turnstile.reset();
+            });
+        }
+    </script>
+</body>
+</html> 
