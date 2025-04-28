@@ -1,9 +1,11 @@
 
 # PaShare ✨
+
+<img width="1457" alt="스크린샷 2025-04-29 오전 3 06 01" src="https://github.com/user-attachments/assets/db8e0374-d82a-4315-b2b1-cda185e3cd3d" />
+
+
 > 복붙보다 빠른 텍스트 공유. 그냥 패스코드만 주고받으세요.
-
 [👉 바로 사용해보기](https://pashare.purplecodelabs.com)  
-
 ---
 
 ## 🛠️ 서비스 소개
