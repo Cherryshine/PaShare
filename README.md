@@ -2,7 +2,7 @@
 # PaShare ✨
 > 복붙보다 빠른 텍스트 공유. 그냥 패스코드만 주고받으세요.
 
-[👉 바로 사용해보기](https://overlap.purplecodelabs.com)  
+[👉 바로 사용해보기](https://pashare.purplecodelabs.com)  
 
 ---
 
@@ -85,7 +85,7 @@ java -jar build/libs/pashare-0.0.1-SNAPSHOT.jar
 ## 🎯 데모 배포
 현재 **PaShare는 직접 배포된 데모 버전**을 체험할 수 있습니다.
 
-[🌐 overlap.purplecodelabs.com](https://overlap.purplecodelabs.com)  
+[🌐 overlap.purplecodelabs.com](https://pashare.purplecodelabs.com)  
 
 (※ 주의: 데모 버전은 트래픽 이슈나 서버 상태에 따라 응답이 느릴 수 있습니다.)
 
